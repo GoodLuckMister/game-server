@@ -35,42 +35,30 @@ const player = {
             this.sprite.y = 0
         }
 
-        const dx = (game.input.mousePointer.x - game.camera.x) - this.sprite.x;
-        const dy = (game.input.mousePointer.y + game.camera.y) - this.sprite.y;
-        const angle = Math.atan2(dy, dx) - Math.PI / 2;
-        let dir = (angle - this.sprite.rotation) / (Math.PI * 2);
-        dir -= Math.round(dir);
-        dir = dir * Math.PI * 2;
-        this.sprite.rotation += dir * 0.1;
-
-
         if (game.input.keyboard.isDown(Phaser.Keyboard.W) || game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
-            this.speed_x += Math.cos(this.sprite.rotation + Math.PI / 2) * this.speed;
-            this.speed_y += Math.sin(this.sprite.rotation + Math.PI / 2) * this.speed;
-            this.sprite.rotation = 0.1
+            this.sprite.y -= 2
 
+            this.sprite.rotation = 1.5
+            this.sprite.angle = 180
 
         }
         if (game.input.keyboard.isDown(Phaser.Keyboard.S) || game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
-            this.speed_x -= Math.cos(this.sprite.rotation + Math.PI / 2) * this.speed;
-            this.speed_y -= Math.sin(this.sprite.rotation + Math.PI / 2) * this.speed;
+            this.sprite.y += 2
+            this.sprite.angle = 0
+            this.sprite.rotation = 0
+
         }
         if (game.input.keyboard.isDown(Phaser.Keyboard.A) || game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
-            this.speed_x -= Math.tan(this.sprite.rotation + Math.PI / 2) * this.speed;
-            this.speed_y -= Math.cos(this.sprite.rotation + Math.PI / 2) * this.speed;
+            this.sprite.x -= 2
+            this.sprite.angle = 90
+            this.sprite.rotation = 1.57
         }
         if (game.input.keyboard.isDown(Phaser.Keyboard.D) || game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
-            this.speed_x += Math.tan(this.sprite.rotation + Math.PI / 2) * this.speed;
-            this.speed_y += Math.cos(this.sprite.rotation + Math.PI / 2) * this.speed;
+            this.sprite.x += 2
+            this.sprite.angle = -90
+            this.sprite.rotation = -1.57
+
         }
-
-        this.sprite.x += this.speed_x;
-        this.sprite.y += this.speed_y;
-
-        this.speed_x *= this.friction;
-        this.speed_y *= this.friction;
-
-
 
         if (game.input.activePointer.leftButton.isDown || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && !this.shot) {
             const speed_x = Math.cos(this.sprite.rotation + Math.PI / 2) * 20;
@@ -83,14 +71,6 @@ const player = {
         }
         if (!game.input.activePointer.leftButton.isDown) this.shot = false;
 
-
-        if (this.sprite.alpha < 1) {
-            this.sprite.alpha += (1 - this.sprite.alpha) * 0.16;
-        } else {
-            this.sprite.alpha = 1;
-        }
-
-
         socket.emit('move-player', { x: this.sprite.x, y: this.sprite.y, angle: this.sprite.rotation })
 
     }
@@ -99,7 +79,6 @@ const player = {
 };
 
 function CreateShip(type, x, y, angle) {
-
     const sprite = game.add.sprite(x, y, 'player');
     sprite.rotation = angle;
     sprite.anchor.setTo(0.5, 0.5);
@@ -109,15 +88,12 @@ function CreateShip(type, x, y, angle) {
 
 function preload() {
     game.load.crossOrigin = "Anonymous";
-    // game.stage.backgroundColor = "#11111";
-
     game.load.image('player', ASSET_URL + '4.png');
     game.load.image('bullet', ASSET_URL + 'cannon_ball.png');
     game.load.image('water', ASSET_URL + 'water_tile.png');
 }
 
 function create() {
-
     for (let i = 0; i <= WORLD_SIZE.w / 64 + 1; i++) {
         for (let j = 0; j <= WORLD_SIZE.h / 64 + 1; j++) {
             const tile_sprite = game.add.sprite(i * 64, j * 64, 'water');
