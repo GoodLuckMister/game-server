@@ -111,7 +111,7 @@ function preload() {
     game.load.crossOrigin = "Anonymous";
     // game.stage.backgroundColor = "#11111";
 
-    game.load.image('player', ASSET_URL + '4.png');
+    game.load.image('player', ASSET_URL + 'player4.png');
     game.load.image('bullet', ASSET_URL + 'cannon_ball.png');
     game.load.image('water', ASSET_URL + 'water_tile.png');
 }

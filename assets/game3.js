@@ -10,7 +10,7 @@ const WORLD_SIZE = { w: 800, h: 600 };
 const water_tiles = [];
 const bullet_array = [];
 
-let socket;
+let socket = io();
 const other_players = {};
 
 const player = {
@@ -22,14 +22,14 @@ const player = {
     shot: false,
     update: function () {
 
-        if (this.sprite.x > 800) {
-            this.sprite.x = 800
+        if (this.sprite.x > WINDOW_WIDTH) {
+            this.sprite.x = WINDOW_WIDTH
         }
         if (this.sprite.x < 0) {
             this.sprite.x = 0
         }
-        if (this.sprite.y > 600) {
-            this.sprite.y = 600
+        if (this.sprite.y > WINDOW_HEIGHT) {
+            this.sprite.y = WINDOW_HEIGHT
         }
         if (this.sprite.y < 0) {
             this.sprite.y = 0
@@ -37,7 +37,6 @@ const player = {
 
         if (game.input.keyboard.isDown(Phaser.Keyboard.W) || game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
             this.sprite.y -= 2
-
             this.sprite.rotation = 1.5
             this.sprite.angle = 180
 
@@ -78,6 +77,7 @@ const player = {
 
 };
 
+
 function CreateShip(type, x, y, angle) {
     const sprite = game.add.sprite(x, y, 'player');
     sprite.rotation = angle;
@@ -86,12 +86,20 @@ function CreateShip(type, x, y, angle) {
 }
 
 
+
 function preload() {
     game.load.crossOrigin = "Anonymous";
-    game.load.image('player', ASSET_URL + '4.png');
+    const number = randomIntFromInterval()
+
+    game.load.image('player', ASSET_URL + `player${number}.png`);
     game.load.image('bullet', ASSET_URL + 'cannon_ball.png');
     game.load.image('water', ASSET_URL + 'water_tile.png');
 }
+
+function randomIntFromInterval() {
+    return Math.floor(Math.random() * (10 - 1 + 1) + 1)
+}
+
 
 function create() {
     for (let i = 0; i <= WORLD_SIZE.w / 64 + 1; i++) {
@@ -116,7 +124,7 @@ function create() {
     game.camera.x = player.sprite.x - WINDOW_WIDTH / 2;
     game.camera.y = player.sprite.y - WINDOW_HEIGHT / 2;
 
-    socket = io();
+
     socket.emit('new-player', { x: player.sprite.x, y: player.sprite.y, angle: player.sprite.rotation, type: 1 })
 
     socket.on('update-players', (players_data) => {
@@ -124,7 +132,7 @@ function create() {
 
         for (let id in players_data) {
 
-            if (other_players[id] == undefined && id != socket.id) {
+            if (other_players[id] === undefined && id !== socket.id) {
                 const data = players_data[id];
                 const p = CreateShip(data.type, data.x, data.y, data.angle);
                 other_players[id] = p;
