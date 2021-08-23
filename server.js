@@ -10,15 +10,13 @@ const io = require('socket.io')(http, {
 
 
 // Serve the index page 
-// app.get("/", (request, response) => {
-//     response.sendFile(__dirname + '/index.html');
-// });
+app.get("/", (request, response) => {
+    response.sendFile(__dirname + '/index.html');
+});
 
 
 // Serve the assets directory
-app.use('*', (req, res) => {
-    res.send('websocket server')
-})
+app.use('/assets', express.static('assets'))
 
 
 
